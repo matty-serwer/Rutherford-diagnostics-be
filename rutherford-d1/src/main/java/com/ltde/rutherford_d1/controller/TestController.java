@@ -19,8 +19,16 @@ import com.ltde.rutherford_d1.model.Patient;
 import com.ltde.rutherford_d1.model.Test;
 import com.ltde.rutherford_d1.repository.TestRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/tests")
+@Tag(name = "Diagnostic Tests", description = "Diagnostic Test Management API")
 public class TestController {
     private final TestRepository testRepository;
 
@@ -28,6 +36,12 @@ public class TestController {
         this.testRepository = testRepository;
     }
 
+    @Operation(summary = "Get all diagnostic tests", description = "Returns a list of all available diagnostic tests")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved test list", 
+                    content = @Content(mediaType = "application/json", 
+                    schema = @Schema(implementation = TestSummaryDTO.class)))
+    })
     @GetMapping
     public List<TestSummaryDTO> getAllTests() {
         return testRepository.findAll().stream()
@@ -35,8 +49,18 @@ public class TestController {
             .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get test by ID", description = "Returns detailed test information with parameters and result history")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved test",
+                    content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TestDetailDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Test not found", 
+                    content = @Content)
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<TestDetailDTO> getTestById(@PathVariable Long id) {
+    public ResponseEntity<TestDetailDTO> getTestById(
+            @io.swagger.v3.oas.annotations.Parameter(description = "Test ID", required = true)
+            @PathVariable Long id) {
         return testRepository.findById(id)
             .map(this::toTestDetailDTO)
             .map(ResponseEntity::ok)

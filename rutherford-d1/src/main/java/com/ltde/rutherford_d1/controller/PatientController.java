@@ -15,8 +15,17 @@ import com.ltde.rutherford_d1.dto.TestSummaryDTO;
 import com.ltde.rutherford_d1.model.Patient;
 import com.ltde.rutherford_d1.repository.PatientRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/patients")
+@Tag(name = "Patient", description = "Patient Management API")
 public class PatientController {
     private final PatientRepository patientRepository;
 
@@ -24,6 +33,12 @@ public class PatientController {
         this.patientRepository = patientRepository;
     }
 
+    @Operation(summary = "Get all patients", description = "Returns a list of all patients with basic information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved patient list", 
+                    content = @Content(mediaType = "application/json", 
+                    schema = @Schema(implementation = PatientDTO.class)))
+    })
     @GetMapping
     public List<PatientDTO> getAllPatients() {
         return patientRepository.findAll().stream()
@@ -31,8 +46,18 @@ public class PatientController {
             .collect(Collectors.toList());
     }
 
+    @Operation(summary = "Get patient by ID", description = "Returns detailed patient information with diagnostic history")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved patient",
+                    content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = PatientDetailDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Patient not found", 
+                    content = @Content)
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<PatientDetailDTO> getPatientById(@PathVariable Long id) {
+    public ResponseEntity<PatientDetailDTO> getPatientById(
+            @Parameter(description = "Patient ID", required = true)
+            @PathVariable Long id) {
         return patientRepository.findById(id)
             .map(this::toPatientDetailDTO)
             .map(ResponseEntity::ok)

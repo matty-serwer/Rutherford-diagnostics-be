@@ -15,10 +15,17 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/patients/**", "/tests/**").permitAll()
-                .anyRequest().authenticated()
+                // TODO: Add JWT authentication
+                // For now, allow all requests
+                .anyRequest().permitAll()
             );
         
         return http.build();
     }
+
+    // TODO: Add these beans when implementing JWT
+    // - JwtAuthenticationFilter
+    // - AuthenticationProvider
+    // - AuthenticationManager
+    // - PasswordEncoder
 } 

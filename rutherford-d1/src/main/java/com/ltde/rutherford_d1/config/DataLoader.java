@@ -1,6 +1,7 @@
 package com.ltde.rutherford_d1.config;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -33,15 +34,31 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Create Patient
-        Patient patient = new Patient();
-        patient.setName("Fido");
-        patient.setSpecies("Dog");
-        patient.setBreed("Labrador");
-        patient.setDateOfBirth(LocalDate.of(2018, 5, 20));
-        patient.setOwnerName("Jane Doe");
-        patient.setOwnerContact("555-1234");
-        patientRepository.save(patient);
+        // Patient data
+        String patientName = "Fido";
+        String ownerName = "Jane Doe";
+        LocalDate dateOfBirth = LocalDate.of(2018, 5, 20);
+        
+        // Check if patient already exists
+        Optional<Patient> existingPatient = patientRepository.findByNameAndOwnerNameAndDateOfBirth(
+            patientName, ownerName, dateOfBirth);
+        
+        Patient patient;
+        if (existingPatient.isPresent()) {
+            System.out.println("Patient already exists: " + patientName + " owned by " + ownerName);
+            patient = existingPatient.get();
+        } else {
+            // Create new patient
+            patient = new Patient();
+            patient.setName(patientName);
+            patient.setSpecies("Dog");
+            patient.setBreed("Labrador");
+            patient.setDateOfBirth(dateOfBirth);
+            patient.setOwnerName(ownerName);
+            patient.setOwnerContact("555-1234");
+            patientRepository.save(patient);
+            System.out.println("Created new patient: " + patientName);
+        }
 
         // Create Test
         Test test = new Test();
@@ -72,6 +89,6 @@ public class DataLoader implements CommandLineRunner {
         result2.setParameter(parameter);
         resultHistoryRepository.save(result2);
 
-        System.out.println("########################XXXXXXXXXXXXXXXXXXPatient count after seeding: " + patientRepository.count());
+        System.out.println("Patient count after seeding: " + patientRepository.count());
     }
 } 
