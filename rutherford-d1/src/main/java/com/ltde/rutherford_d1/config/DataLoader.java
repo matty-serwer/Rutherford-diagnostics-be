@@ -33,6 +33,11 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+        if (patientRepository.count() > 0) {
+            System.out.println("Database already contains data - skipping data load");
+            return;
+        }
+
         createPatientWithTests("Fido", "Dog", "Labrador", 
             LocalDate.of(2018, 5, 20), "Jane Doe", "555-1234",
             LocalDate.of(2024, 3, 14), new double[]{14.5, 13.8, 15.2, 15.2, 13.1, 14.2, 13.3, 13.4, 11.3, 12.0});
