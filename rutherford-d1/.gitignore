@@ -82,6 +82,3 @@ Thumbs.db
 !**/src/test/**/build/
 
 .vscode/settings.json
-.mvn/
-mvnw
-mvnw.cmd
