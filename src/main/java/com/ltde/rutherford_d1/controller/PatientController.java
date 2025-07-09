@@ -55,8 +55,7 @@ public class PatientController {
         List<TestSummaryDTO> tests = patient.getTests().stream()
             .map(test -> new TestSummaryDTO(
                 test.getId(),
-                test.getName(),
-                test.getDatePerformed()
+                test.getName()
             ))
             .collect(Collectors.toList());
 

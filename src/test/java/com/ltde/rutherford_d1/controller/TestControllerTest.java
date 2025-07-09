@@ -66,10 +66,9 @@ class TestControllerTest {
         testPatient.setTests(new ArrayList<>());
         testPatient = patientRepository.save(testPatient);
 
-        // Create test diagnostic with shared parameter properties
+        // Create test diagnostic with shared parameter properties (no datePerformed)
         testDiagnostic = new com.ltde.rutherford_d1.model.Test();
         testDiagnostic.setName("Blood Test");
-        testDiagnostic.setDatePerformed(LocalDate.now());
         testDiagnostic.setParameterName("Hemoglobin");
         testDiagnostic.setUnit("g/dL");
         testDiagnostic.setReferenceMin(12.0);
@@ -82,9 +81,10 @@ class TestControllerTest {
         testPatient.getTests().add(testDiagnostic);
         testPatient = patientRepository.save(testPatient);
 
-        // Create test parameter with only value
+        // Create test parameter with value and datePerformed
         testParameter = new Parameter();
         testParameter.setValue(15.0);
+        testParameter.setDatePerformed(LocalDate.now());
         testParameter.setTest(testDiagnostic);
         testParameter = parameterRepository.save(testParameter);
 
@@ -95,31 +95,30 @@ class TestControllerTest {
 
     @Test
     void getAllTests_ShouldReturnTestsList() throws Exception {
-        mockMvc.perform(get("/tests"))
+        mockMvc.perform(get("/test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-            .andExpect(jsonPath("$[0].name", is("Blood Test")))
-            .andExpect(jsonPath("$[0].datePerformed", is(LocalDate.now().toString())));
+            .andExpect(jsonPath("$[0].name", is("Blood Test")));
     }
 
     @Test
     void getTestById_WithValidId_ShouldReturnTest() throws Exception {
-        mockMvc.perform(get("/tests/{id}", testDiagnostic.getId()))
+        mockMvc.perform(get("/test/{id}", testDiagnostic.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name", is("Blood Test")))
-            .andExpect(jsonPath("$.datePerformed", is(LocalDate.now().toString())))
             .andExpect(jsonPath("$.patient.name", is("TestDog")))
             .andExpect(jsonPath("$.parameterName", is("Hemoglobin")))
             .andExpect(jsonPath("$.unit", is("g/dL")))
             .andExpect(jsonPath("$.referenceMin", is(12.0)))
             .andExpect(jsonPath("$.referenceMax", is(18.0)))
             .andExpect(jsonPath("$.parameters", hasSize(1)))
-            .andExpect(jsonPath("$.parameters[0].value", is(15.0))); // Test parameter only has value
+            .andExpect(jsonPath("$.parameters[0].value", is(15.0)))
+            .andExpect(jsonPath("$.parameters[0].datePerformed", is(LocalDate.now().toString())));
     }
 
     @Test
     void getTestById_WithInvalidId_ShouldReturn404() throws Exception {
-        mockMvc.perform(get("/tests/{id}", 999L))
+        mockMvc.perform(get("/test/{id}", 999L))
             .andExpect(status().isNotFound());
     }
 } 

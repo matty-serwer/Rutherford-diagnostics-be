@@ -54,38 +54,80 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void createPatientsWithMultipleTests() {
-        // Create Walter with multiple tests
+        // Create Walter with multiple tests and measurements over time
         Patient walter = createPatient("Walter", "Dog", "Labrador", 
             LocalDate.of(2018, 5, 20), "Jane Doe", "555-1234");
         
-        createTestForPatient(walter, "Complete Blood Count", LocalDate.of(2024, 3, 14), 
-            "Hemoglobin", "g/dL", 12.0, 18.0, 14.5, 13.8, 15.2, 15.2, 13.1);
+        createTestForPatient(walter, "Complete Blood Count", 
+            "Hemoglobin", "g/dL", 12.0, 18.0,
+            new ParameterData(14.5, LocalDate.of(2024, 3, 14)),
+            new ParameterData(13.8, LocalDate.of(2024, 2, 14)),
+            new ParameterData(15.2, LocalDate.of(2024, 1, 12)),
+            new ParameterData(15.2, LocalDate.of(2023, 9, 24)),
+            new ParameterData(13.1, LocalDate.of(2022, 4, 21)));
             
-        createTestForPatient(walter, "Chemistry Panel", LocalDate.of(2024, 2, 14), 
-            "Glucose", "mg/dL", 70.0, 140.0, 95.0, 88.0, 102.0, 91.5);
+        createTestForPatient(walter, "Chemistry Panel", 
+            "Glucose", "mg/dL", 70.0, 140.0,
+            new ParameterData(95.0, LocalDate.of(2024, 2, 14)),
+            new ParameterData(88.0, LocalDate.of(2024, 1, 14)),
+            new ParameterData(102.0, LocalDate.of(2023, 12, 14)),
+            new ParameterData(91.5, LocalDate.of(2023, 11, 14)));
             
-        createTestForPatient(walter, "Thyroid Panel", LocalDate.of(2024, 1, 14), 
-            "T4", "ug/dL", 1.0, 4.0, 2.8, 2.5, 3.1, 2.9);
+        createTestForPatient(walter, "Thyroid Panel", 
+            "T4", "ug/dL", 1.0, 4.0,
+            new ParameterData(2.8, LocalDate.of(2024, 1, 14)),
+            new ParameterData(2.5, LocalDate.of(2023, 10, 14)),
+            new ParameterData(3.1, LocalDate.of(2023, 7, 14)),
+            new ParameterData(2.9, LocalDate.of(2023, 4, 14)));
 
-        // Create McGrupp with multiple tests
+        // Create McGrupp with multiple tests and measurements over time
         Patient mcgrupp = createPatient("McGrupp", "Dog", "German Shepherd", 
             LocalDate.of(2019, 8, 15), "John Smith", "555-5678");
             
-        createTestForPatient(mcgrupp, "Complete Blood Count", LocalDate.of(2024, 2, 20), 
-            "Hemoglobin", "g/dL", 12.0, 18.0, 16.1, 15.8, 16.5, 15.9);
+        createTestForPatient(mcgrupp, "Complete Blood Count", 
+            "Hemoglobin", "g/dL", 12.0, 18.0,
+            new ParameterData(16.1, LocalDate.of(2024, 2, 20)),
+            new ParameterData(15.8, LocalDate.of(2024, 1, 20)),
+            new ParameterData(16.5, LocalDate.of(2023, 12, 20)),
+            new ParameterData(15.9, LocalDate.of(2023, 11, 20)));
             
-        createTestForPatient(mcgrupp, "Chemistry Panel", LocalDate.of(2024, 1, 20), 
-            "Glucose", "mg/dL", 70.0, 140.0, 88.0, 92.0, 85.5, 90.0, 87.2);
+        createTestForPatient(mcgrupp, "Chemistry Panel", 
+            "Glucose", "mg/dL", 70.0, 140.0,
+            new ParameterData(88.0, LocalDate.of(2024, 1, 20)),
+            new ParameterData(92.0, LocalDate.of(2023, 12, 20)),
+            new ParameterData(85.5, LocalDate.of(2023, 11, 20)),
+            new ParameterData(90.0, LocalDate.of(2023, 10, 20)),
+            new ParameterData(87.2, LocalDate.of(2023, 9, 20)));
 
-        // Create Joan d'Bark with multiple tests
+        // Create Joan d'Bark with multiple tests and measurements over time
         Patient joan = createPatient("Joan d'Bark", "Dog", "Golden Retriever", 
             LocalDate.of(2020, 3, 10), "Alice Johnson", "555-9012");
             
-        createTestForPatient(joan, "Complete Blood Count", LocalDate.of(2024, 1, 5), 
-            "Hemoglobin", "g/dL", 12.0, 18.0, 13.2, 12.8, 13.5);
+        createTestForPatient(joan, "Complete Blood Count", 
+            "Hemoglobin", "g/dL", 12.0, 18.0,
+            new ParameterData(13.2, LocalDate.of(2024, 1, 5)),
+            new ParameterData(12.8, LocalDate.of(2023, 12, 5)),
+            new ParameterData(13.5, LocalDate.of(2023, 11, 5)));
             
-        createTestForPatient(joan, "Liver Function", LocalDate.of(2023, 12, 5), 
-            "ALT", "U/L", 10.0, 80.0, 35.0, 28.0, 42.0, 31.5, 38.2, 33.1);
+        createTestForPatient(joan, "Liver Function", 
+            "ALT", "U/L", 10.0, 80.0,
+            new ParameterData(35.0, LocalDate.of(2023, 12, 5)),
+            new ParameterData(28.0, LocalDate.of(2023, 11, 5)),
+            new ParameterData(42.0, LocalDate.of(2023, 10, 5)),
+            new ParameterData(31.5, LocalDate.of(2023, 9, 5)),
+            new ParameterData(38.2, LocalDate.of(2023, 8, 5)),
+            new ParameterData(33.1, LocalDate.of(2023, 7, 5)));
+    }
+
+    // Helper class to hold parameter data with date
+    private static class ParameterData {
+        final Double value;
+        final LocalDate date;
+        
+        ParameterData(Double value, LocalDate date) {
+            this.value = value;
+            this.date = date;
+        }
     }
 
     private Patient createPatient(String name, String species, String breed, 
@@ -101,13 +143,12 @@ public class DataLoader implements CommandLineRunner {
         return patientRepository.save(patient);
     }
 
-    private void createTestForPatient(Patient patient, String testName, LocalDate testDate, 
+    private void createTestForPatient(Patient patient, String testName, 
                                      String parameterName, String unit, Double referenceMin, Double referenceMax,
-                                     Double... values) {
-        // Create Test with shared parameter properties
+                                     ParameterData... parameterDataArray) {
+        // Create Test with shared parameter properties (no datePerformed)
         Test test = new Test();
         test.setName(testName);
-        test.setDatePerformed(testDate);
         test.setParameterName(parameterName);
         test.setUnit(unit);
         test.setReferenceMin(referenceMin);
@@ -116,10 +157,11 @@ public class DataLoader implements CommandLineRunner {
         test.setParameters(new ArrayList<>());
         test = testRepository.save(test);
 
-        // Create Parameters with only values
-        for (Double value : values) {
+        // Create Parameters with individual values and dates
+        for (ParameterData paramData : parameterDataArray) {
             Parameter parameter = new Parameter();
-            parameter.setValue(value);
+            parameter.setValue(paramData.value);
+            parameter.setDatePerformed(paramData.date);
             parameter.setTest(test);
             parameter = parameterRepository.save(parameter);
 

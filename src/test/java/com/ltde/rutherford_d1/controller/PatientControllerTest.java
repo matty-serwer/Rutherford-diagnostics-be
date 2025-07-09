@@ -55,7 +55,7 @@ class PatientControllerTest {
 
     @Test
     void getAllPatients_ShouldReturnPatientsList() throws Exception {
-        mockMvc.perform(get("/patients"))
+        mockMvc.perform(get("/patient"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
             .andExpect(jsonPath("$[0].name", is("TestDog")))
@@ -66,7 +66,7 @@ class PatientControllerTest {
 
     @Test
     void getPatientById_WithValidId_ShouldReturnPatient() throws Exception {
-        mockMvc.perform(get("/patients/{id}", testPatient.getId()))
+        mockMvc.perform(get("/patient/{id}", testPatient.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name", is("TestDog")))
             .andExpect(jsonPath("$.species", is("Dog")))
@@ -77,7 +77,7 @@ class PatientControllerTest {
 
     @Test
     void getPatientById_WithInvalidId_ShouldReturn404() throws Exception {
-        mockMvc.perform(get("/patients/{id}", 999L))
+        mockMvc.perform(get("/patient/{id}", 999L))
             .andExpect(status().isNotFound());
     }
 } 

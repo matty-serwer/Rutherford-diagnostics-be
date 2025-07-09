@@ -45,8 +45,7 @@ public class TestController {
     private TestSummaryDTO toTestSummaryDTO(Test test) {
         return new TestSummaryDTO(
             test.getId(),
-            test.getName(),
-            test.getDatePerformed()
+            test.getName()
         );
     }
 
@@ -54,7 +53,6 @@ public class TestController {
         return new TestDetailDTO(
             test.getId(),
             test.getName(),
-            test.getDatePerformed(),
             toPatientDTO(test.getPatient()),
             test.getParameterName(),
             test.getUnit(),
@@ -81,7 +79,8 @@ public class TestController {
     private ParameterDTO toParameterDTO(Parameter parameter) {
         return new ParameterDTO(
             parameter.getId(),
-            parameter.getValue()
+            parameter.getValue(),
+            parameter.getDatePerformed()
         );
     }
 } 

@@ -1,5 +1,7 @@
 package com.ltde.rutherford_d1.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +17,8 @@ public class Parameter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private Double value; // The only unique property per parameter
+    private Double value; // The measurement value
+    private LocalDate datePerformed; // When this specific measurement was taken
 
     @ManyToOne
     @JoinColumn(name = "test_id")
