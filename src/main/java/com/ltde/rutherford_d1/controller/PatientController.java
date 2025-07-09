@@ -16,7 +16,7 @@ import com.ltde.rutherford_d1.model.Patient;
 import com.ltde.rutherford_d1.repository.PatientRepository;
 
 @RestController
-@RequestMapping("/patients")
+@RequestMapping("/patient")
 public class PatientController {
     private final PatientRepository patientRepository;
 
@@ -55,8 +55,7 @@ public class PatientController {
         List<TestSummaryDTO> tests = patient.getTests().stream()
             .map(test -> new TestSummaryDTO(
                 test.getId(),
-                test.getName(),
-                test.getDatePerformed()
+                test.getName()
             ))
             .collect(Collectors.toList());
 

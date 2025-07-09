@@ -19,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ltde.rutherford_d1.model.Parameter;
 import com.ltde.rutherford_d1.model.Patient;
-import com.ltde.rutherford_d1.model.ResultHistory;
 import com.ltde.rutherford_d1.repository.ParameterRepository;
 import com.ltde.rutherford_d1.repository.PatientRepository;
-import com.ltde.rutherford_d1.repository.ResultHistoryRepository;
 import com.ltde.rutherford_d1.repository.TestRepository;
 
 @SpringBootTest
@@ -42,9 +40,6 @@ class TestControllerTest {
     @Autowired
     private ParameterRepository parameterRepository;
 
-    @Autowired
-    private ResultHistoryRepository resultHistoryRepository;
-
     private com.ltde.rutherford_d1.model.Test testDiagnostic;
     private Patient testPatient;
     private Parameter testParameter;
@@ -56,7 +51,6 @@ class TestControllerTest {
     @BeforeEach
     void setUp() {
         // Delete all existing data
-        resultHistoryRepository.deleteAll();
         parameterRepository.deleteAll();
         testRepository.deleteAll();
         patientRepository.deleteAll();
@@ -72,10 +66,13 @@ class TestControllerTest {
         testPatient.setTests(new ArrayList<>());
         testPatient = patientRepository.save(testPatient);
 
-        // Create test diagnostic
+        // Create test diagnostic with shared parameter properties (no datePerformed)
         testDiagnostic = new com.ltde.rutherford_d1.model.Test();
         testDiagnostic.setName("Blood Test");
-        testDiagnostic.setDatePerformed(LocalDate.now());
+        testDiagnostic.setParameterName("Hemoglobin");
+        testDiagnostic.setUnit("g/dL");
+        testDiagnostic.setReferenceMin(12.0);
+        testDiagnostic.setReferenceMax(18.0);
         testDiagnostic.setPatient(testPatient);
         testDiagnostic.setParameters(new ArrayList<>());
         testDiagnostic = testRepository.save(testDiagnostic);
@@ -84,60 +81,44 @@ class TestControllerTest {
         testPatient.getTests().add(testDiagnostic);
         testPatient = patientRepository.save(testPatient);
 
-        // Create test parameter
+        // Create test parameter with value and datePerformed
         testParameter = new Parameter();
-        testParameter.setName("Hemoglobin");
-        testParameter.setUnit("g/dL");
-        testParameter.setReferenceMin(12.0);
-        testParameter.setReferenceMax(18.0);
+        testParameter.setValue(15.0);
+        testParameter.setDatePerformed(LocalDate.now());
         testParameter.setTest(testDiagnostic);
-        testParameter.setHistory(new ArrayList<>());
         testParameter = parameterRepository.save(testParameter);
 
         // Add parameter to test's parameters list
         testDiagnostic.getParameters().add(testParameter);
         testDiagnostic = testRepository.save(testDiagnostic);
-
-        // Create test result
-        ResultHistory testResult = new ResultHistory();
-        testResult.setResultDate(LocalDate.now());
-        testResult.setValue(15.0);
-        testResult.setParameter(testParameter);
-        resultHistoryRepository.save(testResult);
-
-        // Add result to parameter's history
-        testParameter.getHistory().add(testResult);
-        parameterRepository.save(testParameter);
     }
 
     @Test
     void getAllTests_ShouldReturnTestsList() throws Exception {
-        mockMvc.perform(get("/tests"))
+        mockMvc.perform(get("/test"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))))
-            .andExpect(jsonPath("$[0].name", is("Blood Test")))
-            .andExpect(jsonPath("$[0].datePerformed", is(LocalDate.now().toString())));
+            .andExpect(jsonPath("$[0].name", is("Blood Test")));
     }
 
     @Test
     void getTestById_WithValidId_ShouldReturnTest() throws Exception {
-        mockMvc.perform(get("/tests/{id}", testDiagnostic.getId()))
+        mockMvc.perform(get("/test/{id}", testDiagnostic.getId()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name", is("Blood Test")))
-            .andExpect(jsonPath("$.datePerformed", is(LocalDate.now().toString())))
             .andExpect(jsonPath("$.patient.name", is("TestDog")))
+            .andExpect(jsonPath("$.parameterName", is("Hemoglobin")))
+            .andExpect(jsonPath("$.unit", is("g/dL")))
+            .andExpect(jsonPath("$.referenceMin", is(12.0)))
+            .andExpect(jsonPath("$.referenceMax", is(18.0)))
             .andExpect(jsonPath("$.parameters", hasSize(1)))
-            .andExpect(jsonPath("$.parameters[0].name", is("Hemoglobin")))
-            .andExpect(jsonPath("$.parameters[0].unit", is("g/dL")))
-            .andExpect(jsonPath("$.parameters[0].referenceMin", is(12.0)))
-            .andExpect(jsonPath("$.parameters[0].referenceMax", is(18.0)))
-            .andExpect(jsonPath("$.parameters[0].history", hasSize(1)))
-            .andExpect(jsonPath("$.parameters[0].history[0].value", is(15.0)));
+            .andExpect(jsonPath("$.parameters[0].value", is(15.0)))
+            .andExpect(jsonPath("$.parameters[0].datePerformed", is(LocalDate.now().toString())));
     }
 
     @Test
     void getTestById_WithInvalidId_ShouldReturn404() throws Exception {
-        mockMvc.perform(get("/tests/{id}", 999L))
+        mockMvc.perform(get("/test/{id}", 999L))
             .andExpect(status().isNotFound());
     }
 } 

@@ -1,6 +1,5 @@
 package com.ltde.rutherford_d1.model;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -21,7 +20,12 @@ public class Test {
     private Long id;
     
     private String name;
-    private LocalDate datePerformed;
+    
+    // Shared parameter properties (all parameters in this test share these)
+    private String parameterName;
+    private String unit;
+    private Double referenceMin;
+    private Double referenceMax;
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
