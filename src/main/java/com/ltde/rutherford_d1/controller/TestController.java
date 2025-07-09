@@ -13,18 +13,22 @@ import com.ltde.rutherford_d1.dto.ParameterDTO;
 import com.ltde.rutherford_d1.dto.PatientDTO;
 import com.ltde.rutherford_d1.dto.TestDetailDTO;
 import com.ltde.rutherford_d1.dto.TestSummaryDTO;
+import com.ltde.rutherford_d1.model.HealthStatus;
 import com.ltde.rutherford_d1.model.Parameter;
 import com.ltde.rutherford_d1.model.Patient;
 import com.ltde.rutherford_d1.model.Test;
 import com.ltde.rutherford_d1.repository.TestRepository;
+import com.ltde.rutherford_d1.service.HealthAnalysisService;
 
 @RestController
 @RequestMapping("/test")
 public class TestController {
     private final TestRepository testRepository;
+    private final HealthAnalysisService healthAnalysisService;
 
-    public TestController(TestRepository testRepository) {
+    public TestController(TestRepository testRepository, HealthAnalysisService healthAnalysisService) {
         this.testRepository = testRepository;
+        this.healthAnalysisService = healthAnalysisService;
     }
 
     @GetMapping
@@ -77,10 +81,22 @@ public class TestController {
     }
 
     private ParameterDTO toParameterDTO(Parameter parameter) {
+        // Calculate health status if not already set
+        HealthStatus status = parameter.getStatus();
+        if (status == null) {
+            Test test = parameter.getTest();
+            status = healthAnalysisService.calculateParameterStatus(
+                parameter.getValue(), 
+                test.getReferenceMin(), 
+                test.getReferenceMax()
+            );
+        }
+        
         return new ParameterDTO(
             parameter.getId(),
             parameter.getValue(),
-            parameter.getDatePerformed()
+            parameter.getDatePerformed(),
+            status  // Include the health status in the DTO
         );
     }
 } 
