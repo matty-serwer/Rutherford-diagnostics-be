@@ -16,7 +16,7 @@ import com.ltde.rutherford_d1.model.Patient;
 import com.ltde.rutherford_d1.repository.PatientRepository;
 
 @RestController
-@RequestMapping("/patients")
+@RequestMapping("/patient")
 public class PatientController {
     private final PatientRepository patientRepository;
 

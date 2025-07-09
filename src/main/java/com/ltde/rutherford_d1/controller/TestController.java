@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ltde.rutherford_d1.dto.ParameterDTO;
 import com.ltde.rutherford_d1.dto.PatientDTO;
-import com.ltde.rutherford_d1.dto.ResultHistoryDTO;
 import com.ltde.rutherford_d1.dto.TestDetailDTO;
 import com.ltde.rutherford_d1.dto.TestSummaryDTO;
 import com.ltde.rutherford_d1.model.Parameter;
@@ -20,7 +19,7 @@ import com.ltde.rutherford_d1.model.Test;
 import com.ltde.rutherford_d1.repository.TestRepository;
 
 @RestController
-@RequestMapping("/tests")
+@RequestMapping("/test")
 public class TestController {
     private final TestRepository testRepository;
 
@@ -57,6 +56,10 @@ public class TestController {
             test.getName(),
             test.getDatePerformed(),
             toPatientDTO(test.getPatient()),
+            test.getParameterName(),
+            test.getUnit(),
+            test.getReferenceMin(),
+            test.getReferenceMax(),
             test.getParameters().stream()
                 .map(this::toParameterDTO)
                 .collect(Collectors.toList())
@@ -76,20 +79,9 @@ public class TestController {
     }
 
     private ParameterDTO toParameterDTO(Parameter parameter) {
-        List<ResultHistoryDTO> history = parameter.getHistory().stream()
-            .map(result -> new ResultHistoryDTO(
-                result.getResultDate(),
-                result.getValue()
-            ))
-            .collect(Collectors.toList());
-
         return new ParameterDTO(
             parameter.getId(),
-            parameter.getName(),
-            parameter.getUnit(),
-            parameter.getReferenceMin(),
-            parameter.getReferenceMax(),
-            history
+            parameter.getValue()
         );
     }
 } 

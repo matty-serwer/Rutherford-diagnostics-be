@@ -8,5 +8,9 @@ public record TestDetailDTO(
     String name,
     LocalDate datePerformed,
     PatientDTO patient,
+    String parameterName,
+    String unit,
+    Double referenceMin,
+    Double referenceMax,
     List<ParameterDTO> parameters
 ) {} 

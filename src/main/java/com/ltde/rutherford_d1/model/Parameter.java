@@ -1,8 +1,12 @@
 package com.ltde.rutherford_d1.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
-import java.util.List;
 
 @Entity
 @Data
@@ -11,15 +15,9 @@ public class Parameter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String name;
-    private String unit;
-    private Double referenceMin;
-    private Double referenceMax;
+    private Double value; // The only unique property per parameter
 
     @ManyToOne
     @JoinColumn(name = "test_id")
     private Test test;
-
-    @OneToMany(mappedBy = "parameter", cascade = CascadeType.ALL)
-    private List<ResultHistory> history;
 } 
