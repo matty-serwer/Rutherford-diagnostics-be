@@ -3,6 +3,8 @@ package com.ltde.rutherford_d1.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +21,10 @@ public class Parameter {
     
     private Double value; // The measurement value
     private LocalDate datePerformed; // When this specific measurement was taken
+    
+    // Health status calculated based on value vs reference range
+    @Enumerated(EnumType.STRING)
+    private HealthStatus status;
 
     @ManyToOne
     @JoinColumn(name = "test_id")
