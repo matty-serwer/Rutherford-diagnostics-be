@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,7 @@ public class HealthController {
      * Get comprehensive health summary for a specific patient
      */
     @GetMapping("/patient/{id}/summary")
+    @Transactional
     public ResponseEntity<PatientHealthDTO> getPatientHealthSummary(@PathVariable Long id) {
         return patientRepository.findById(id)
             .map(this::toPatientHealthDTO)
@@ -53,8 +55,17 @@ public class HealthController {
      * Get detailed alerts for a specific patient's abnormal parameters
      */
     @GetMapping("/patient/{id}/alerts")
+    @Transactional
     public ResponseEntity<List<ParameterAlertDTO>> getPatientAlerts(@PathVariable Long id) {
         return patientRepository.findById(id)
+            .map(patient -> {
+                System.out.println("Patient: " + patient.getName());
+                System.out.println("Patient ID: " + patient.getId());
+                System.out.println("Patient tests: " + patient.getTests());
+                System.out.println("Patient parameters: " + patient.getTests().stream().flatMap(test -> test.getParameters().stream()).collect(Collectors.toList()));
+                System.out.println("Patient abnormal parameters: " + healthAnalysisService.getAbnormalParameters(patient));
+                return patient;
+            })
             .map(patient -> {
                 List<Parameter> abnormalParameters = healthAnalysisService.getAbnormalParameters(patient);
                 return abnormalParameters.stream()
@@ -71,15 +82,17 @@ public class HealthController {
      * Get summary of all patients with active health alerts
      */
     @GetMapping("/alerts")
+    @Transactional
     public ResponseEntity<List<PatientAlertSummaryDTO>> getAllActiveAlerts() {
         List<PatientAlertSummaryDTO> alerts = patientRepository.findAll().stream()
             .map(this::toPatientAlertSummaryDTO)
             .filter(alert -> alert.abnormalCount() > 0) // Only include patients with alerts
             .sorted(Comparator.comparing((PatientAlertSummaryDTO alert) -> alert.criticalCount()).reversed()
                     .thenComparing(PatientAlertSummaryDTO::abnormalCount).reversed())
-            .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(alerts);
+                .collect(Collectors.toList());
+            System.out.println("Alerts: ");
+            System.out.println(alerts);
+            return ResponseEntity.ok(alerts);
     }
 
     /**
